@@ -1,0 +1,517 @@
+<?php
+/**
+ * @file
+ * rCron Steps
+ *
+ * Provide step functions for functional testing.
+ * This file is created automatically by the Gherkin compiler.
+ *
+ * Note, therefore, that most of this file might be changed automatically
+ * when you run the compiler again. This @file description will not be affected,
+ * but all of the function header comments are (re)generated automatically.
+ *
+ * Be assured that no functions will be deleted and the compiler will
+ * not alter code within a function unless you make it look like a function header.
+ *
+ * You may also add statements just below this header (for example "use" and "require_once").
+ */
+use rCredits as r;
+use rCredits\DB as db;
+use rCredits\Testing as t;
+use rCredits\Util as u;
+use rCredits\Backend as be;
+use rCredits\Cron as cr;
+
+require_once __DIR__ . '/../defs.inc';
+define('IAOY', t('inflation adjustment on your'));
+
+if (basename($_SERVER['SCRIPT_FILENAME']) != 'compile.php') {
+  require_once __DIR__ . '/../rcredits.inc';
+  require_once __DIR__ . '/../rcredits-testing.inc';
+}
+
+/**
+ * Add additional setup for any or all features or tests
+ */
+function extraSetup($feature) {
+  t\clear(TX_CRON);
+}
+
+/**
+ * members: (ARG)
+ *
+ * in: MAKE Bank Setup
+ *     MAKE Bank AMemberIsUnderMinimumAndHasRequestedInsufficientFundsFromTheBank
+ *     MAKE Bank AMemberIsUnderMinimumOnlyBecauseRewardsAreReserved
+ *     MAKE CommunityBits Setup
+ *     MAKE Gifts Setup
+ *     MAKE Invoices Setup
+ *     MAKE Joint Setup
+ *     MAKE Monthly Setup
+ *     MAKE Notices Setup
+ *     MAKE Recache Setup
+ *     BOTH Risk Setup
+ *     TEST Risk WeCalculateRisks
+ *     MAKE Tickle Setup
+ *     MAKE Trust Setup
+ *     TEST Trust WeCalculateTrust
+ *     MAKE Weekly Setup
+ */
+function members($list) {return t\members($list);}
+
+
+/**
+ * balances: (ARG)
+ *
+ * in: MAKE Bank AMemberIsBarelyBelowMinimum
+ *     MAKE Bank AMemberHasANegativeBalance
+ *     MAKE Bank AnUnbankedMemberBarelyBelowMinimumDrawsOnAnotherAccount
+ *     MAKE Bank AnUnbankedMemberBarelyBelowMinimumCannotDrawOnAnotherAccount
+ *     MAKE Bank AMemberIsAtMinimum
+ *     MAKE Bank AMemberIsWellBelowMinimum
+ *     MAKE Bank AMemberIsUnderMinimumButAlreadyRequestedBarelyEnoughFundsFromTheBank
+ *     MAKE Bank AMemberIsUnderMinimumAndHasRequestedInsufficientFundsFromTheBank
+ *     MAKE Bank AMemberIsUnderMinimumOnlyBecauseRewardsAreReserved
+ *     MAKE Bank AMemberMemberWithZeroMinimumHasBalanceBelowMinimum
+ *     MAKE Bank AnUnbankedMemberWithZeroMinimumHasBalanceBelowMinimum
+ *     MAKE Bank AMemberHasADepositedButNotCompletedTransfer
+ *     MAKE Bank AnAccountHasAMinimumButNoRefills
+ *     MAKE CommunityBits Setup
+ *     MAKE Gifts Setup
+ *     TEST Invoices Setup
+ *     TEST Invoices UnpaidInvoicesGetHandled
+ *     TEST Joint Setup
+ *     MAKE Joint AJointAccountNeedsRefilling
+ *     MAKE Joint AJointAccountDoesNotNeedRefilling
+ *     TEST Monthly Setup
+ *     TEST Recache Setup
+ *     BOTH Recache BalancesGetOutOfWhack
+ *     MAKE Recache BalancesGetATinyBitOutOfWhack
+ *     MAKE Tickle AMemberGetsNoNewCreditLineBecauseTheChangeWouldBeMinimal
+ *     TEST Weekly AMemberCrawlsOutOfDebt
+ *     TEST Weekly AMemberBuildsUpSavings
+ *     TEST Weekly AMemberCashesOutAutomatically
+ */
+function balances($list) {return t\balances($list);}
+
+/**
+ * cron runs (ARG)
+ *
+ * in: MAKE Bank AMemberIsBarelyBelowMinimum
+ *     MAKE Bank AMemberHasANegativeBalance
+ *     MAKE Bank AnUnbankedMemberBarelyBelowMinimumDrawsOnAnotherAccount
+ *     MAKE Bank AnUnbankedMemberBarelyBelowMinimumCannotDrawOnAnotherAccount
+ *     MAKE Bank AMemberIsAtMinimum
+ *     MAKE Bank AMemberIsWellBelowMinimum
+ *     MAKE Bank AMemberIsUnderMinimumButAlreadyRequestedBarelyEnoughFundsFromTheBank
+ *     MAKE Bank AMemberIsUnderMinimumAndHasRequestedInsufficientFundsFromTheBank
+ *     MAKE Bank AMemberIsUnderMinimumOnlyBecauseRewardsAreReserved
+ *     MAKE Bank AMemberMemberWithZeroMinimumHasBalanceBelowMinimum
+ *     MAKE Bank AnUnbankedMemberWithZeroMinimumHasBalanceBelowMinimum
+ *     MAKE Bank AMemberHasADepositedButNotCompletedTransfer
+ *     MAKE Bank AnAccountHasAMinimumButNoRefills
+ *     MAKE CommunityBits CommunityBansSpendingBelowZero
+ *     MAKE Gifts ADonationCanBeCompleted
+ *     MAKE Gifts ADonationCanBeCompletedEvenIfTheMemberHasNeverYetMadeAnRCardPurchase
+ *     MAKE Gifts ARecurringDonationCanBeCompleted
+ *     MAKE Invoices UnpaidInvoicesGetHandled
+ *     MAKE Joint AJointAccountNeedsRefilling
+ *     MAKE Joint AJointAccountDoesNotNeedRefilling
+ *     MAKE Monthly InflationAdjustmentsRoundUpDonationsAndCrumbDonationsAreMade
+ *     MAKE Notices AMemberGetsSomeNotices
+ *     MAKE Notices AMemberGetsSomeWeeklyNotices
+ *     MAKE Recache BalancesGetOutOfWhack
+ *     MAKE Recache BalancesGetATinyBitOutOfWhack
+ *     MAKE Risk Setup
+ *     MAKE Risk WeCalculateRisks
+ *     MAKE Tickle ANewbieHasNotTakenTheFirstStep
+ *     MAKE Tickle ANewbieHasTakenSomeStepsButNotAll
+ *     MAKE Tickle ANonmemberHasNotAcceptedTheInvitation
+ *     MAKE Tickle ANonmemberHasNotAcceptedTheInvitationFromANotyetactiveMember
+ *     MAKE Tickle ANonmemberHasAcceptedTheInvitation
+ *     MAKE Tickle ANonmemberHasAcceptedAnInvitationFromSomeoneElseInstead
+ *     MAKE Tickle AMemberGetsNoNewCreditLineBecauseTheChangeWouldBeMinimal
+ *     MAKE Trust WeCalculateTrust
+ *     MAKE Weekly AMemberCrawlsOutOfDebt
+ *     MAKE Weekly AMemberBuildsUpSavings
+ *     MAKE Weekly AMemberCashesOutAutomatically
+ */
+function cronRuns($op) {return t\cronRuns($op);}
+
+/**
+ * usd transfers: (ARG)
+ *
+ * in: TEST Bank AMemberIsBarelyBelowMinimum
+ *     TEST Bank AMemberHasANegativeBalance
+ *     TEST Bank AMemberIsWellBelowMinimum
+ *     TEST Bank AMemberIsUnderMinimumButAlreadyRequestedBarelyEnoughFundsFromTheBank
+ *     TEST Bank AMemberIsUnderMinimumAndHasRequestedInsufficientFundsFromTheBank
+ *     TEST Bank AMemberIsUnderMinimumOnlyBecauseRewardsAreReserved
+ *     TEST Bank AMemberMemberWithZeroMinimumHasBalanceBelowMinimum
+ *     MAKE Bank AMemberHasADepositedButNotCompletedTransfer
+ *     TEST Invoices UnpaidInvoicesGetHandled
+ *     TEST Joint AJointAccountNeedsRefilling
+ *     MAKE Monthly Setup
+ *     MAKE Risk Setup
+ *     TEST Risk WeCalculateRisks
+ *     TEST Weekly AMemberCashesOutAutomatically
+ */
+function usdTransfers($tx) {return t\usdTransfers($tx);}
+
+/**
+ * bank transfer count is (ARG)
+ *
+ * in: TEST Bank AMemberIsAtMinimum
+ *     TEST Bank AMemberIsUnderMinimumButAlreadyRequestedBarelyEnoughFundsFromTheBank
+ *     TEST Bank AnUnbankedMemberWithZeroMinimumHasBalanceBelowMinimum
+ *     TEST Bank AMemberHasADepositedButNotCompletedTransfer
+ *     TEST Bank AnAccountHasAMinimumButNoRefills
+ *     TEST Joint AJointAccountDoesNotNeedRefilling
+ */
+function bankTransferCountIs($count) {return (t\usdTransferCount() == $count);}
+
+/**
+ * relations: (ARG)
+ *
+ * in: MAKE Bank Setup
+ *     MAKE Invoices Setup
+ *     MAKE Joint Setup
+ *     MAKE Risk Setup
+ */
+function relations($relations) {return t\relations($relations);}
+
+
+/**
+ * transactions: (ARG)
+ *
+ * in: TEST Bank AnUnbankedMemberBarelyBelowMinimumDrawsOnAnotherAccount
+ *     TEST Gifts ADonationCanBeCompleted
+ *     TEST Gifts ADonationCanBeCompletedEvenIfTheMemberHasNeverYetMadeAnRCardPurchase
+ *     TEST Gifts ARecurringDonationCanBeCompleted
+ *     MAKE Invoices Setup
+ *     TEST Invoices UnpaidInvoicesGetHandled
+ *     MAKE Joint Setup
+ *     MAKE Monthly Setup
+ *     TEST Monthly InflationAdjustmentsRoundUpDonationsAndCrumbDonationsAreMade
+ *     MAKE Recache Setup
+ *     MAKE Risk Setup
+ *     TEST Risk WeCalculateRisks
+ *     MAKE Tickle AMemberGetsNoNewCreditLineBecauseTheChangeWouldBeMinimal
+ *     MAKE Weekly AMemberCashesOutAutomatically
+ */
+function transactions($list) {return t\transactions($list);}
+
+/**
+ * we notice (ARG) to member (ARG) with subs: (ARG)
+ *
+ * in: TEST Bank AMemberIsBarelyBelowMinimum
+ *     TEST Bank AMemberHasANegativeBalance
+ *     TEST Bank AnUnbankedMemberBarelyBelowMinimumDrawsOnAnotherAccount
+ *     TEST Bank AMemberIsWellBelowMinimum
+ *     TEST Gifts ADonationCanBeCompleted
+ *     TEST Gifts ARecurringDonationCanBeCompleted
+ *     TEST Invoices UnpaidInvoicesGetHandled
+ *     TEST Joint AJointAccountNeedsRefilling
+ *     TEST Tickle ANewbieHasNotTakenTheFirstStep
+ *     TEST Tickle ANonmemberHasNotAcceptedTheInvitation
+ *     TEST Weekly AMemberCashesOutAutomatically
+ */
+function weNoticeToMemberWithSubs($notice, $id, $subs) {return t\notice($notice, $id, $subs);}
+
+/**
+ * we notice (ARG) to member (ARG)
+ *
+ * in: TEST Bank AnUnbankedMemberBarelyBelowMinimumCannotDrawOnAnotherAccount
+ *     TEST Tickle ANewbieHasNotTakenTheFirstStep
+ *     TEST Tickle ANewbieHasTakenSomeStepsButNotAll
+ */
+function weNoticeToMember($notice, $id) {return t\notice($notice, $id);}
+
+/**
+ * gifts: (ARG)
+ *
+ * in: BOTH Gifts ADonationCanBeCompleted
+ *     MAKE Gifts ADonationCanBeCompletedEvenIfTheMemberHasNeverYetMadeAnRCardPurchase
+ *     BOTH Gifts ARecurringDonationCanBeCompleted
+ *     MAKE Risk Setup
+ */
+function gifts($gifts) {return t\gifts($gifts);}
+
+/**
+ * we tell admin (ARG) with subs: (ARG)
+ *
+ * in: TEST Monthly InflationAdjustmentsRoundUpDonationsAndCrumbDonationsAreMade
+ *     TEST Recache BalancesGetOutOfWhack
+ *     TEST Recache BalancesGetATinyBitOutOfWhack
+ */
+function weTellAdminWithSubs($topic, $subs) {return t\weTellAdmin($topic, $subs);}
+
+/**
+ * we tell (ARG) CO (ARG) with subs: (ARG)
+ *
+ * in: TEST CommunityBits CommunityBansSpendingBelowZero
+ */
+function weTellCOWithSubs($id, $topic, $subs) {return t\weTellAdmin($topic, $subs, t\uid($id));}
+
+/**
+ * notices: (ARG)
+ *
+ * in: BOTH Notices AMemberGetsSomeNotices
+ *     BOTH Notices AMemberGetsSomeWeeklyNotices
+ */
+function notices($list) {return t\notices($list);}
+
+/**
+ * we email (ARG) to member (ARG) with subs: (ARG)
+ *
+ * in: TEST Notices AMemberGetsSomeNotices
+ *     TEST Notices AMemberGetsSomeWeeklyNotices
+ *     TEST Tickle ANonmemberHasNotAcceptedTheInvitation
+ */
+function weEmailToMemberWithSubs($key, $email, $subs) {return t\findEmail($key, $email, $subs);}
+
+/**
+ * notice count is (ARG)
+ *
+ * in: 
+ */
+function noticeCountIs($count) {
+  return (db\count('r_notices') == $count);
+}
+
+/**
+ * member (ARG) charges member (ARG) $(ARG) for (ARG)
+ *
+ * in: 
+ */
+function memberChargesMemberFor($payee, $payer, $amount, $for) {
+  global $testOnly; if ($testOnly) return FALSE;
+  global $scanned; $scanned = TRUE;
+  be\transfer('charge', acct(t\uid($payee)), acct(t\uid($payer)), $amount, TRUE, $for);
+  return TRUE;
+}
+
+/**
+ * member (ARG) confirms form (ARG) with values: (ARG)
+ *
+ * in: 
+ */
+function memberConfirmsFormWithValues($id, $page, $values) {return t\completeForm($id, $page, $values, TRUE);}
+
+/**
+ * USD payment by member (ARG) is not recorded
+ *
+ * in: 
+ */
+function uSDPaymentByMemberIsNotRecorded($id) {
+  global $testOnly; if ($testOnly) return FALSE;
+  $id = t\uid($id);
+  return db\q('DELETE FROM r_usd WHERE payer=:id LIMIT 1', compact('id'));
+}
+
+/**
+ * usd transfer count is (ARG)
+ *
+ * in: TEST Invoices UnpaidInvoicesGetHandled
+ */
+function usdTransferCountIs($count) {return (t\usdTransferCount() == $count);}
+
+/**
+ * next DO code is (ARG)
+ *
+ * in: 
+ */
+function nextDOCodeIs($code) {
+  global $testOnly; if ($testOnly) return FALSE;
+  global $testDoCode;
+  return $testDoCode = $code;
+}
+
+/**
+ * member (ARG) trades $(ARG) USD to member (ARG) for rCredits
+ *
+ * in: 
+ */
+function memberTradesUSDToMemberForRCredits($id1, $amount, $id2) {
+  global $testOnly; if ($testOnly) return FALSE;
+  return (bool) r\tradeR($amount, $id2, $id1);
+}
+
+/**
+ * we message member (ARG) with topic (ARG) and subs: (ARG)
+ *
+ * in: 
+ */
+function weMessageMemberWithTopicAndSubs($id, $topic, $subs) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  $a = acct(t\uid($id));
+  $message = t($topic, @$subs[0]);
+  $topic = $GLOBALS['topics'][$topic];
+  $fullName = $a->fullName;
+  return weEmailToMemberWithSubs('message', $a->email, compact(ray('message topic fullName')));
+}
+
+/**
+ * members have: (ARG)
+ *
+ * in: MAKE Bank AnAccountHasAMinimumButNoRefills
+ *     MAKE CommunityBits CommunityBansSpendingBelowZero
+ *     BOTH Tickle AMemberGetsNoNewCreditLineBecauseTheChangeWouldBeMinimal
+ *     MAKE Weekly AMemberBuildsUpSavings
+ *     MAKE Weekly AMemberCashesOutAutomatically
+ */
+function membersHave($list) {return t\membersHave($list);}
+
+/**
+ * that (ARG) has link results: (ARG)
+ *
+ * in: TEST Gifts ADonationCanBeCompleted
+ *     TEST Gifts ARecurringDonationCanBeCompleted
+ */
+function thatHasLinkResults($thing, $info) {return t\hasLinkResults($thing, $info);}
+
+/**
+ * member (ARG) has done step (ARG)
+ *
+ * in: MAKE Tickle ANewbieHasNotTakenTheFirstStep
+ *     MAKE Tickle ANewbieHasTakenSomeStepsButNotAll
+ */
+function memberHasDoneStep($id, $step) {return t\doneStep($id, $step);}
+
+/**
+ * invites: (ARG)
+ *
+ * in: MAKE Risk Setup
+ *     MAKE Tickle ANewbieHasNotTakenTheFirstStep
+ *     MAKE Tickle ANonmemberHasNotAcceptedTheInvitation
+ *     MAKE Tickle ANonmemberHasNotAcceptedTheInvitationFromANotyetactiveMember
+ *     MAKE Tickle ANonmemberHasAcceptedTheInvitation
+ *     MAKE Tickle ANonmemberHasAcceptedAnInvitationFromSomeoneElseInstead
+ */
+function invites($list) {return t\invites($list);}
+
+/**
+ * we do not email (ARG) to member (ARG)
+ *
+ * in: TEST Tickle ANonmemberHasAcceptedTheInvitation
+ *     TEST Tickle ANonmemberHasAcceptedAnInvitationFromSomeoneElseInstead
+ */
+function weDoNotEmailToMember($index, $email) {return t\noSuchEmail($index, $email);}
+
+/**
+ * it's time for (ARG)
+ *
+ * in: MAKE Notices AMemberGetsSomeWeeklyNotices
+ */
+function itsTimeFor($what) {
+  global $testOnly, $timeFor;
+  return $testOnly ? $timeFor[$what] : ($timeFor[$what] = TRUE);
+}
+
+/**
+ * proxies: (ARG)
+ *
+ * in: MAKE Risk Setup
+ *     MAKE Trust Setup
+ */
+function proxies($list) {return t\proxies($list);}
+/**
+ * member field values: (ARG)
+ *
+ * in: MAKE Risk Setup
+ */
+function memberFieldValues($list) {return t\memberFieldValues($list);}
+
+/**
+ * member (ARG) has no photo ID recorded
+ *
+ * in: MAKE Gifts ADonationCanBeCompletedEvenIfTheMemberHasNeverYetMadeAnRCardPurchase
+ */
+function memberHasNoPhotoIDRecorded($id) {return t\noPhotoId($id);}
+
+/**
+ * variable (ARG) is (ARG) with subs: (ARG)
+ *
+ * in: 
+ */
+function variableIsWithSubs($var, $index, $subs) {return t\varIs($var, $index, $subs);}
+
+/**
+ * community email for member (ARG) is (ARG)
+ *
+ * in: MAKE Notices Setup
+ */
+function communityEmailForMemberIs($id, $email) {
+  global $testOnly; if ($testOnly) return FALSE;
+  return r\acct(t\uid($id))->cttyA->update('email', $email);
+}
+
+/**
+ * member (ARG) cache is ok
+ *
+ * in: TEST Monthly InflationAdjustmentsRoundUpDonationsAndCrumbDonationsAreMade
+ */
+function memberCacheIsOk($id) {return r\acct(t\uid($id))->cacheOk();}
+
+/**
+ * oftenness works
+ *
+ * in: 
+ */
+function oftennessWorks() {
+  global $testOnly; if (!$testOnly) return FALSE;
+  include_once __DIR__ . '/rcron/rcron.inc';
+  
+  
+  $oftentests = 'year 01 1/1/2000 12/31/2000 0, year 01 1/1/2000 1/1/2001 1, year 01 1/1/2000 1/2/2001 1, '
+  . 'year 01 1/3/2000 12/31/2000 0, year 01 1/3/2000 1/1/2001 1, year 01 1/3/2000 1/4/2001 1, ' // two days late last time
+  . 'month 01 1/1/2000 1/31/2000 0, month 01 1/1/2000 2/1/2000 1, month 01 1/1/2000 2/2/2000 1, '
+  . 'month 01 1/3/2000 1/31/2000 0, month 01 1/3/2000 2/1/2000 1, month 01 1/3/2000 2/4/2000 1, ' // two days late last time
+  . 'week 0 1/2/2000 1/8/2000 0, week 0 1/2/2000 1/9/2000 1, week 0 1/2/2000 1/10/2000 1, '
+  . 'week 0 1/4/2000 1/8/2000 0, week 0 1/4/2000 1/9/2000 1, week 0 1/4/2000 1/12/2000 1, '; // two days late last time
+
+  $ok = TRUE;
+  foreach (ray($oftenttests) as $one) {
+    if (!$one) break;
+    list ($period, $chosen, $last, $time, $want) = ray($one);
+    \variable_set('r_last_cron', [$period => strtotime($last)]);
+    if (cr\timeFor(strtotime($time), $period, $chosen) != $want) $ok = t\output("test failed: $one");
+  }
+  return $ok;
+}
+
+/**
+ * we do not notice to member (ARG)
+ *
+ * in: TEST Tickle ANonmemberHasNotAcceptedTheInvitationFromANotyetactiveMember
+ */
+function weDoNotNoticeToMember($id) {return !t\notice([], $id);}
+
+/**
+ * we do not email (ARG)
+ *
+ * in: TEST Tickle ANonmemberHasNotAcceptedTheInvitationFromANotyetactiveMember
+ */
+function weDoNotEmail($email) {return t\noEmailTo($email);}
+
+/**
+ * invoices: (ARG)
+ *
+ * in: MAKE Invoices Setup
+ *     TEST Invoices UnpaidInvoicesGetHandled
+ */
+function invoices($list) {return t\invoices($list);}
+
+/**
+ * we message (ARG) to member (ARG) with subs: (ARG)
+ *
+ * in: TEST Invoices UnpaidInvoicesGetHandled
+ */
+function weMessageToMemberWithSubs($index, $id, $subs) {return t\weMessage($index, $id, $subs);}
+
+/**
+ * stats: (ARG)
+ *
+ * in: MAKE CommunityBits CommunityBansSpendingBelowZero
+ */
+function stats($list) {return t\stats($list);}

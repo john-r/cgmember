@@ -1,0 +1,1381 @@
+<?php
+/**
+ * @file
+ * rWeb Steps
+ *
+ * Provide step functions for functional testing.
+ * This file is created automatically by the Gherkin compiler.
+ *
+ * Note, therefore, that most of this file might be changed automatically
+ * when you run the compiler again. This @file description will not be affected,
+ * but all of the function header comments are (re)generated automatically.
+ *
+ * Be assured that no functions will be deleted and the compiler will
+ * not alter code within a function unless you make it look like a function header.
+ *
+ * You may also add statements just below this header (for example "use" and "require_once").
+ */
+use CG as r;
+use CG\DB as db;
+use CG\Testing as t;
+use CG\Util as u;
+use CG\Backend as be;
+use CG\Web as w;
+
+require_once __DIR__ . '/../defs.inc';
+
+if (basename($_SERVER['SCRIPT_FILENAME']) != 'compile.php') {
+  require_once __DIR__ . '/../cg.inc';
+  require_once __DIR__ . '/../cg-testing.inc';
+}
+
+/**
+ * Add additional setup for any or all features or tests
+ * The feature object contains information about the current feature and test, etc.
+ */
+function extraSetup() {
+  t\clear(TX_WEB);
+}
+
+function tlog($msg, $type = 'test', $info = array()) {return u\log($msg, $type, $info);}
+
+/**
+ * member (ARG) completes form (ARG) with values: (ARG)
+ *
+ * in: MAKE Bank AMemberMovesCreditToTheBank
+ *     MAKE Bank AMemberDrawsCreditFromTheBankWithZeroFloor
+ *     MAKE Bank AMemberDrawsCreditFromTheBankWithAdequateFloor
+ *     MAKE Bank AMemberMovesTooLittleToTheBank
+ *     MAKE Bank AMemberMovesTooMuchToTheBank
+ *     MAKE Bank AMemberTriesToGoBelowTheirMinimum
+ *     MAKE Bank AMemberAsksToDoTwoTransfersOutInOneDay
+ *     MAKE Coupons AMemberRedeemsAGiftCoupon
+ *     MAKE Coupons AMemberRedeemsADiscountCouponForADollarAmount
+ *     MAKE Exchange AMemberAsksToChargeAnotherMember
+ *     MAKE Exchange AMemberAsksToPayAnotherMember
+ *     MAKE Exchange AMemberAsksToCashOutTooMuch
+ *     MAKE Flow AMemberOverdrawsWithNotEnoughToDrawOn
+ *     MAKE Gift AMemberDonates
+ *     MAKE Gift AMemberDonatesWithInsufficientFunds
+ *     MAKE Invest AMemberJoinsTheInvestmentClub
+ *     MAKE Joint AJoinedAccountSlaveMemberRequestsANewMinimum
+ *     MAKE Membership AMemberSignsInForTheFirstTime
+ *     MAKE Preferences AMemberChangesPreferences
+ *     MAKE Signin AMemberAsksForANewPasswordForUsername
+ *     MAKE Signin AMemberAsksForANewPasswordForAccountID
+ *     MAKE Signin AMemberAsksForANewPasswordForEmail
+ *     MAKE Signin AMemberAsksForANewPasswordForAnUnknownAccount
+ *     MAKE Signin AMemberAsksForANewPasswordForACompany
+ *     MAKE Signin AMemberClicksALinkToResetPassword
+ *     MAKE Signin AMemberClicksALinkToResetPasswordWithWrongCode
+ *     MAKE Signin AMemberClicksALinkToResetPasswordForUnknownAccount
+ *     MAKE Transact AMemberAsksToChargeAnotherMemberForGoods
+ *     MAKE Transact AMemberAsksToPayAnotherMemberForGoods
+ *     MAKE Transact AMemberAsksToPayAnotherMemberForLoanreimbursement
+ */
+function memberCompletesFormWithValues($id, $page, $values) {return t\completeForm($id, $page, $values);}
+
+/**
+ * member (ARG) confirms form (ARG) with values: (ARG)
+ *
+ * in: MAKE Company AMemberUpdatesCompanyInfo
+ *     MAKE Company AMemberGivesABadEmployeeCount
+ *     MAKE Company AMemberGivesABadGross
+ *     MAKE Contact AMemberUpdatesContactInfo
+ *     MAKE Contact AMemberGivesABadPhone
+ *     MAKE Contact AMemberGivesABadEmail
+ *     MAKE Contact AMemberUpdatesToADifferentState
+ *     MAKE Contact AMemberUpdatesToADifferentName
+ *     MAKE Coupons AMemberRedeemsADiscountCouponForADollarAmount
+ *     MAKE Exchange AMemberConfirmsRequestToChargeAnotherMember
+ *     MAKE Exchange AMemberConfirmsRequestToPayAnotherMember
+ *     MAKE Flow AMemberDraws
+ *     MAKE Flow AMemberDrawsAgain
+ *     MAKE Invoice AMemberConfirmsRequestToChargeAnotherMember
+ *     MAKE Invoice AMemberConfirmsRequestToChargeANotyetMember
+ *     MAKE Invoice AMemberDeniesAnInvoice
+ *     MAKE Invoice AMemberApprovesAnInvoiceWithInsufficientFunds
+ *     MAKE Invoice AMemberApprovesInvoicesForevermore
+ *     MAKE Invoice AMemberApprovesAnInvoiceToATrustingCustomer
+ *     MAKE Joint AMemberRequestsAJointAccount
+ *     MAKE Membership AMemberSignsInForTheFirstTime
+ *     MAKE PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     MAKE Signin AMemberSignsInWithUsernameOnTheMemberSite
+ *     MAKE Signin AMemberSignsInWithAccountIDOnTheMemberSite
+ *     MAKE Signin AMemberSignsInWithEmailOnTheMemberSite
+ *     MAKE Signin AMemberTypesTheWrongPassword
+ *     MAKE Signin AMemberTypesAnUnknownUsernameID
+ *     MAKE Signin AMemberClicksALinkToResetPassword
+ *     MAKE Signup ANewbieVisitsTheRegistrationPageWithAUsedInvite
+ *     MAKE Signup ANewbieRegistersInWesternMassachusetts
+ *     MAKE Signup ANewbieRegistersWithAnUnconfirmedIcardInvitation
+ *     MAKE Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ *     MAKE Signup ANewbieRegistersWithADifferentLegalName
+ *     MAKE Signup ANewbieRegistersFromElsewhere
+ *     MAKE Signup ANewbieRegistersWithNoCase
+ *     MAKE Signup AMemberRegistersBadEmail
+ *     MAKE Signup AMemberRegistersBadName
+ *     MAKE Signup AMemberRegistersBadZip
+ *     MAKE Signup AMemberRegistersAgain
+ *     MAKE Signup AMemberRegistersWithAnExistingCompany
+ *     MAKE Signup AMemberRegistersWithAnUnknownCompany
+ *     MAKE Signup AMemberRegistersWithACompanyWithNoRelation
+ *     MAKE Signup AMemberRegistersWithABadCompanyPhone
+ *     MAKE SignupCo AMemberRegistersACompany
+ *     MAKE SignupCo AMemberRegistersACompanyWhileManagingAnotherAccount
+ *     MAKE SignupCo AMemberRegistersACompanyHavingGivenCompanyInfo
+ *     MAKE Transact AMemberConfirmsRequestToChargeAnotherMember
+ *     MAKE Transact AMemberConfirmsRequestToPayAnotherMember
+ *     MAKE Transact AMemberConfirmsRequestToPayAnotherMemberALot
+ *     MAKE Transact AMemberConfirmsRequestToPayAMemberCompany
+ */
+function memberConfirmsFormWithValues($id, $page, $values) {return t\completeForm($id, $page, $values, TRUE);}
+
+/**
+ * a member confirms form (ARG) (which logs out) with values: (ARG)
+ *
+ * in: 
+ */
+function aMemberConfirmsFormwhichLogsOutWithValues($page, $values) {
+  global $testOnly; if ($testOnly) return FALSE;
+  global $skipToStep;
+//  $result = t\postLogout(__FUNCTION__) ?: 
+  return MemberConfirmsFormWithValues('?', $page, $values);
+//  $skipToStep = NULL;
+  return $result;
+}
+
+/*
+  $sta = array();
+ * $sta['input']['mail'] = 'robouser@example.com';
+ * $sta['input']['pass']['pass1'] = 'password';
+ * $sta['input']['pass']['pass2'] = 'password';
+ * $sta['input']['op'] = t('Create new account');
+ * drupal_form_submit('user_register_form', $sta);
+ * @endcode
+ 
+ function drupal_get_form($form_id) {
+  $sta = array();
+
+  $args = func_get_args();
+  // Remove $form_id from the arguments.
+  array_shift($args);
+  $sta['build_info']['args'] = $args;
+
+  return drupal_build_form($form_id, $sta);
+}
+ */
+
+/**
+ * members: (ARG)
+ *
+ * in: MAKE Bank Setup
+ *     MAKE Community Setup
+ *     MAKE Company Setup
+ *     TEST Company AMemberUpdatesCompanyInfo
+ *     MAKE Contact Setup
+ *     TEST Contact AMemberUpdatesContactInfo
+ *     TEST Contact AMemberUpdatesToADifferentState
+ *     TEST Contact AMemberUpdatesToADifferentName
+ *     MAKE Coupons Setup
+ *     MAKE Download Setup
+ *     MAKE EditTx Setup
+ *     MAKE Exchange Setup
+ *     MAKE Flow Setup
+ *     MAKE Gift Setup
+ *     MAKE Invest Setup
+ *     MAKE Invoice Setup
+ *     MAKE Joint Setup
+ *     MAKE Membership Setup
+ *     TEST Membership AMemberSignsInForTheFirstTime
+ *     MAKE PartnerSignup Setup
+ *     TEST PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     MAKE PartnerSignup AMemberVisitsTheRegistrationPageSentByAPartner
+ *     MAKE Preferences Setup
+ *     TEST Preferences AMemberChangesPreferences
+ *     MAKE Relations Setup
+ *     MAKE ScanCard Setup
+ *     MAKE Signin Setup
+ *     MAKE Signin AMemberAsksForANewPasswordForACompany
+ *     MAKE Signup Setup
+ *     TEST Signup ANewbieRegistersInWesternMassachusetts
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedIcardInvitation
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ *     TEST Signup ANewbieRegistersWithADifferentLegalName
+ *     TEST Signup ANewbieRegistersFromElsewhere
+ *     TEST Signup ANewbieRegistersWithNoCase
+ *     MAKE Signup AMemberRegistersAgain
+ *     BOTH Signup AMemberRegistersWithAnExistingCompany
+ *     TEST Signup AMemberRegistersWithAnUnknownCompany
+ *     MAKE SignupCo Setup
+ *     TEST SignupCo AMemberRegistersACompany
+ *     MAKE Statement Setup
+ *     MAKE Summary Setup
+ *     MAKE Transact Setup
+ *     MAKE Transactions Setup
+ */
+function members($list) {return t\members($list);}
+
+/**
+ * transactions: (ARG)
+ *
+ * in: MAKE Bank Setup
+ *     MAKE Community Setup
+ *     MAKE Download Setup
+ *     MAKE EditTx Setup
+ *     MAKE EditTx ABuyerDisputesACharge
+ *     MAKE EditTx ASellerReversesACharge
+ *     MAKE Exchange Setup
+ *     TEST Exchange AMemberConfirmsRequestToPayAnotherMember
+ *     TEST Flow AMemberDraws
+ *     TEST Flow AMemberDrawsAgain
+ *     TEST Gift AMemberDonates
+ *     MAKE Invoice Setup
+ *     TEST Invoice AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Invoice AMemberApprovesAnInvoiceToATrustingCustomer
+ *     MAKE Joint Setup
+ *     MAKE Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     MAKE Joint AJoinedAccountMemberUnjoinsTheAccount
+ *     MAKE Preferences Setup
+ *     MAKE Preferences AMemberChangesPreferences
+ *     MAKE Statement Setup
+ *     MAKE Summary Setup
+ *     MAKE Summary AMemberClicksTheSummaryTabWithRoundups
+ *     MAKE Transact Setup
+ *     TEST Transact AMemberConfirmsRequestToPayAnotherMember
+ *     TEST Transact AMemberConfirmsRequestToPayAnotherMemberALot
+ *     TEST Transact AMemberConfirmsRequestToPayAMemberCompany
+ *     MAKE Transactions Setup
+ *     MAKE Transactions AMemberLooksAtTransactionsWithRoundups
+ */
+function transactions($list) {return t\transactions($list);}
+
+/**
+ * we say (ARG): (ARG) with subs: (ARG)
+ *
+ * in: TEST Bank AMemberMovesCreditToTheBank
+ *     TEST Bank AMemberDrawsCreditFromTheBankWithZeroFloor
+ *     TEST Bank AMemberDrawsCreditFromTheBankWithAdequateFloor
+ *     TEST Bank AMemberMovesTooMuchToTheBank
+ *     TEST Bank AMemberAsksToDoTwoTransfersOutInOneDay
+ *     TEST EditTx ABuyerTriesToDecreaseAPaymentAmount
+ *     TEST Exchange AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Exchange AMemberConfirmsRequestToPayAnotherMember
+ *     TEST Exchange AMemberAsksToCashOutTooMuch
+ *     TEST Flow AMemberOverdrawsWithNotEnoughToDrawOn
+ *     TEST Gift AMemberDonates
+ *     TEST Gift AMemberDonatesWithInsufficientFunds
+ *     TEST Invoice AMemberApprovesAnInvoiceWithInsufficientFunds
+ *     TEST Joint AMemberRequestsAJointAccount
+ *     TEST Joint AMemberRequestsTwoJoinsAtOnce
+ *     TEST PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     TEST PartnerSignup AMemberVisitsTheRegistrationPageSentByAPartner
+ *     TEST Relations AMemberAddsARelation
+ *     TEST Signin AMemberAsksForANewPasswordForACompany
+ *     TEST Signup AMemberRegistersBadName
+ *     TEST Signup AMemberRegistersAgain
+ *     TEST Signup AMemberRegistersWithABadCompanyPhone
+ *     TEST Transact AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Transact AMemberConfirmsRequestToPayAnotherMember
+ *     TEST Transact AMemberConfirmsRequestToPayAMemberCompany
+ */
+function weSayWithSubs($type, $index, $subs) {
+  global $testOnly, $testJSMsgs;
+
+  $subs = @$subs[0] ?: array();
+  if (isset($subs['email'])) t\fixEmail($subs['email']);
+  $msg0 = t($index);
+  foreach ($subs as $key => $value) {
+    if ($value == '?') $wild = $subs[$key] = u\randomString(20, 'word'); // mark the wildcard spot
+    if (strpos($msg0, "%$key") === FALSE) return t\output("missing sub '$key' in message '$index'");
+  }
+  $wantMsg = t($index, $subs);
+  $msgs = array_merge(\drupal_get_messages($type ?: NULL, FALSE), $testJSMsgs ?: []);
+  if (@$wild) {
+    $i = strpos($wantMsg, $wild);
+    $tailLen = strlen($wantMsg) - $i - strlen($wild);
+    foreach (@$msgs[$type] ?: [] as $actual) {
+      if (substr($actual, 0, $i) == substr($wantMsg, 0, $i) and substr($actual, -$tailLen) == substr($wantMsg, -$tailLen)) {$res = TRUE; break;}
+    }
+  } else {
+    $tmsg = strip_tags($wantMsg);
+    foreach (@$msgs[$type] ?: [] as $actual) {
+      $actual = strip_tags($actual);
+      $actual = strtr($actual, ["ACTUAL: \r\n"=>'', "Confirm\r\n"=>'', "\r\nOkay\r\n"=>'', "Cancel\r\n\r\n"=>'']);
+      if ($actual == $tmsg) {$res = TRUE; break;}
+    }
+//  $res = (@$msgs[$type] and array_search($wantMsg, $msgs[$type]) !== FALSE);
+  }
+/**/  if (!@$res) debug(compact('wantMsg', 'msgs')); // + ['dmsgs'=>\drupal_get_messages(NULL, FALSE)]);
+  t\output("EXPECT: $wantMsg", 'output'); // this must come after array_search!
+  return @$res;
+}
+
+/**
+ * we say (ARG): (ARG)
+ *
+ * in: TEST Bank AMemberMovesTooLittleToTheBank
+ *     TEST Bank AMemberTriesToGoBelowTheirMinimum
+ *     TEST Company AMemberUpdatesCompanyInfo
+ *     TEST Contact AMemberUpdatesContactInfo
+ *     TEST Contact AMemberGivesABadPhone
+ *     TEST Contact AMemberGivesABadEmail
+ *     TEST Contact AMemberUpdatesToADifferentState
+ *     TEST Contact AMemberUpdatesToADifferentName
+ *     TEST Coupons AMemberRedeemsAGiftCoupon
+ *     TEST EditTx ABuyerIncreasesAPaymentAmount
+ *     TEST EditTx ABuyerChangesTheGoodsStatus
+ *     TEST Invoice AMemberConfirmsRequestToChargeANotyetMember
+ *     TEST Membership AMemberSignsInForTheFirstTime
+ *     TEST Relations AMemberTriesToAddARelationWithSelf
+ *     TEST Relations AMemberTriesToAddARelationAgain
+ *     TEST Signin AMemberTypesTheWrongPassword
+ *     TEST Signin AMemberTypesAnUnknownUsernameID
+ *     TEST Signin AMemberAsksForANewPasswordForAnUnknownAccount
+ *     TEST Signin AMemberClicksALinkToResetPasswordWithWrongCode
+ *     TEST Signin AMemberClicksALinkToResetPasswordForUnknownAccount
+ *     TEST Signup ANewbieRegistersInWesternMassachusetts
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedIcardInvitation
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ *     TEST Signup ANewbieRegistersFromElsewhere
+ *     TEST Signup AMemberRegistersBadEmail
+ *     TEST Signup AMemberRegistersBadZip
+ *     TEST Signup AMemberRegistersWithACompanyWithNoRelation
+ *     TEST SignupCo AMemberRegistersACompany
+ */
+function weSay($type, $index) {return weSayWithSubs($type, $index, array());}
+
+/**
+ * we email (ARG) to member (ARG) with subs: (ARG)
+ *
+ * in: TEST Membership AMemberSignsInForTheFirstTime
+ *     TEST PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     TEST Signin AMemberAsksForANewPasswordForUsername
+ *     TEST Signin AMemberAsksForANewPasswordForAccountID
+ *     TEST Signin AMemberAsksForANewPasswordForEmail
+ *     TEST Signup ANewbieRegistersInWesternMassachusetts
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedIcardInvitation
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ *     TEST Signup ANewbieRegistersFromElsewhere
+ */
+function weEmailToMemberWithSubs($key, $email, $subs) {return t\findEmail($key, $email, $subs);}
+
+/**
+ * we tell admin (ARG) with subs: (ARG)
+ *
+ * in: TEST Gift AMemberDonatesWithInsufficientFunds
+ */
+function weTellAdminWithSubs($topic, $subs) {return t\weTellAdmin($topic, $subs);}
+
+/**
+ * we show (ARG)
+ *
+ * in: TEST Invest AMemberJoinsTheInvestmentClub
+ *     TEST Membership AMemberSignsInForTheFirstTime
+ *     TEST PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     TEST Signin AMemberSignsInWithUsernameOnTheMemberSite
+ *     TEST Signin AMemberSignsInWithAccountIDOnTheMemberSite
+ *     TEST Signin AMemberSignsInWithEmailOnTheMemberSite
+ *     TEST Signin AMemberClicksALinkToResetPassword
+ *     TEST Signin AMemberClicksALinkToResetPasswordWithWrongCode
+ *     TEST Signin AMemberClicksALinkToResetPasswordForUnknownAccount
+ *     TEST Signup ANewbieVisitsTheRegistrationPageWithExpiredInvite
+ *     TEST Signup ANewbieVisitsTheRegistrationPageWithAUsedInvite
+ *     TEST Signup ANewbieRegistersInWesternMassachusetts
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedIcardInvitation
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ *     TEST Signup ANewbieRegistersFromElsewhere
+ *     TEST Summary MembersAccountIsNotActive
+ */
+function weShow($what, $show = TRUE) {return t\weShow($what, $show);}
+
+/**
+ * we show (ARG) with subs: (ARG)
+ *
+ * in: 
+ */
+function weShowWithSubs($page, $subs) {return t\weShowWithSubs($page, $subs);}
+
+/**
+ * we show (ARG) with: (ARG)
+ *
+ * in: TEST Bank AMemberAsksToDoTwoTransfersOutInOneDay
+ *     TEST Community CronCalculatesTheStatistics
+ *     TEST Company AMemberVisitsTheCompanyInfoPage
+ *     TEST Contact AMemberVisitsTheContactInfoPage
+ *     TEST EditTx ABuyerChangesTheTransactionDescription
+ *     TEST EditTx ABuyerDisputesACharge
+ *     TEST EditTx ASellerReversesACharge
+ *     TEST Invest AMemberJoinsTheInvestmentClub
+ *     TEST Invoice AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Invoice AMemberConfirmsRequestToChargeANotyetMember
+ *     TEST Joint AMemberRequestsAJointAccount
+ *     TEST Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     TEST Joint AMemberRequestsTwoJoinsAtOnce
+ *     TEST PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     TEST Preferences AMemberVisitsThePreferencesPage
+ *     TEST Preferences AnotherMemberVisitsThePreferencesPage
+ *     TEST Relations MemberHasAnEmployeeConfirmed
+ *     TEST Relations MemberHasAnEmployeeUnconfirmed
+ *     TEST Relations MemberHasARelationWithAContractor
+ *     TEST Relations MemberHasAnEmployeeClaimed
+ *     TEST Relations EmployeeCanOnlyRead
+ *     TEST Relations MemberHasAnEmployer
+ *     TEST Relations MemberHasAccessToEmployeeAccount
+ *     TEST Relations MemberCompanyHasRelations
+ *     TEST Relations ItsComplicated
+ *     TEST Relations AMemberAddsARelation
+ *     TEST ScanCard SomeoneScansACompanyAgentCard
+ *     TEST Signin AMemberVisitsTheMemberSite
+ *     TEST SignupCo AMemberRegistersACompany
+ *     TEST Statement AMemberLooksAtAStatementForPreviousMonth
+ *     TEST Summary AMemberClicksTheSummaryTab
+ *     TEST Summary AMemberClicksTheSummaryTabWithRoundups
+ *     TEST Summary AnAgentClicksTheSummaryTabWithoutPermissionToManage
+ *     TEST Summary ACompanyAgentClicksTheSummaryTab
+ *     TEST Transactions AMemberLooksAtTransactionsForThePastYear
+ *     TEST Transactions AMemberLooksAtTransactionsForThePastFewDays
+ *     TEST Transactions AMemberLooksAtTransactionsWithRoundups
+ */
+function weShowWith($title, $content = FALSE, $debug = TRUE) {return t\weShowWith($title, $content, $debug);}
+
+/**
+ * with: (ARG)
+ *
+ * in: TEST Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     TEST Relations ItsComplicated
+ *     TEST SignupCo AMemberRegistersACompany
+ *     TEST Statement AMemberLooksAtAStatementForPreviousMonth
+ *     TEST Transactions AMemberLooksAtTransactionsForThePastYear
+ *     TEST Transactions AMemberLooksAtTransactionsForThePastFewDays
+ *     TEST Transactions AMemberLooksAtTransactionsWithRoundups
+ */
+function with($content) {return weShow($content);}
+
+/**
+ * without: (ARG)
+ *
+ * in: TEST PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     TEST Relations MemberHasAnEmployer
+ *     TEST Relations MemberCompanyHasRelations
+ *     TEST Statement AMemberLooksAtAStatementForPreviousMonth
+ *     TEST Summary AnAgentClicksTheSummaryTabWithoutPermissionToManage
+ *     TEST Transactions AMemberLooksAtTransactionsForThePastYear
+ *     TEST Transactions AMemberLooksAtTransactionsForThePastFewDays
+ */
+function without($content) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  if (!is_array($content)) return !weShow($content, FALSE);
+  foreach ($content as $one) if (weShow(array($one), FALSE)) return FALSE;
+  return TRUE;
+}
+
+/**
+ * with options: (ARG)
+ *
+ * in: 
+ */
+function withOptions($options, $debug = TRUE) {return t\shownWith($options, 'options', $debug);}
+
+/**
+ * without options: (ARG)
+ *
+ * in: 
+ */
+function withoutOptions($options) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  foreach ($options as $one) if (WithOptions(array($one), FALSE)) return FALSE;
+  return TRUE;
+}
+
+/**
+ * relations: (ARG)
+ *
+ * in: MAKE Community Setup
+ *     MAKE Company Setup
+ *     MAKE Download Setup
+ *     MAKE EditTx Setup
+ *     MAKE Exchange Setup
+ *     MAKE Flow Setup
+ *     MAKE Invoice Setup
+ *     TEST Invoice AMemberApprovesInvoicesForevermore
+ *     MAKE Invoice AMemberApprovesAnInvoiceToATrustingCustomer
+ *     MAKE Joint AMemberRequestsAJointAccount
+ *     MAKE Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     MAKE Joint AJoinedAccountMemberUnjoinsTheAccount
+ *     MAKE Joint AMemberRequestsTwoJoinsAtOnce
+ *     MAKE Membership Setup
+ *     TEST PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     TEST PartnerSignup AMemberVisitsTheRegistrationPageSentByAPartner
+ *     MAKE Relations MemberHasAnEmployeeConfirmed
+ *     MAKE Relations MemberHasAnEmployeeUnconfirmed
+ *     MAKE Relations MemberHasARelationWithAContractor
+ *     MAKE Relations MemberHasAnEmployeeClaimed
+ *     MAKE Relations EmployeeCanOnlyRead
+ *     MAKE Relations MemberHasAnEmployer
+ *     MAKE Relations MemberHasAccessToEmployeeAccount
+ *     MAKE Relations MemberCompanyHasRelations
+ *     MAKE Relations ItsComplicated
+ *     MAKE Relations AMemberTriesToAddARelationAgain
+ *     MAKE ScanCard Setup
+ *     TEST Signup AMemberRegistersWithAnExistingCompany
+ *     MAKE SignupCo Setup
+ *     TEST SignupCo AMemberRegistersACompany
+ *     MAKE Statement Setup
+ *     MAKE Summary Setup
+ *     MAKE Transact Setup
+ *     MAKE Transactions Setup
+ */
+function relations($relations) {return t\relations($relations);}
+
+/**
+ * balances: (ARG)
+ *
+ * in: TEST Bank Setup
+ *     TEST Bank AMemberMovesCreditToTheBank
+ *     TEST Bank AMemberDrawsCreditFromTheBankWithZeroFloor
+ *     TEST Bank AMemberDrawsCreditFromTheBankWithAdequateFloor
+ *     TEST Community Setup
+ *     TEST Coupons AMemberRedeemsAGiftCoupon
+ *     TEST Coupons AMemberRedeemsADiscountCouponForADollarAmount
+ *     TEST Download Setup
+ *     TEST EditTx Setup
+ *     TEST EditTx ABuyerIncreasesAPaymentAmount
+ *     TEST EditTx ABuyerChangesTheGoodsStatus
+ *     TEST Exchange Setup
+ *     TEST Exchange AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Exchange AMemberConfirmsRequestToPayAnotherMember
+ *     MAKE Flow Setup
+ *     MAKE Gift Setup
+ *     TEST Invoice Setup
+ *     TEST Invoice AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Invoice AMemberDeniesAnInvoice
+ *     TEST Invoice AMemberApprovesAnInvoiceWithInsufficientFunds
+ *     TEST Invoice AMemberApprovesAnInvoiceToATrustingCustomer
+ *     TEST Joint Setup
+ *     TEST Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     TEST Joint AJoinedAccountMemberUnjoinsTheAccount
+ *     TEST SignupCo AMemberRegistersACompany
+ *     TEST Statement Setup
+ *     TEST Summary Setup
+ *     TEST Summary AMemberClicksTheSummaryTabWithRoundups
+ *     TEST Transact Setup
+ *     TEST Transact AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Transact AMemberConfirmsRequestToPayAnotherMember
+ *     MAKE Transact AMemberConfirmsRequestToPayAnotherMemberALot
+ *     TEST Transact AMemberConfirmsRequestToPayAMemberCompany
+ *     TEST Transactions Setup
+ *     TEST Transactions AMemberLooksAtTransactionsWithRoundups
+ */
+function balances($list) {return t\balances($list);}
+
+/**
+ * usd: (ARG)
+ *
+ * in: 
+ */
+function usd($list) {return t\usd($list);}
+
+/**
+ * member (ARG) visits page (ARG)
+ *
+ * in: MAKE Community CronCalculatesTheStatistics
+ *     MAKE Company AMemberVisitsTheCompanyInfoPage
+ *     MAKE Contact AMemberVisitsTheContactInfoPage
+ *     MAKE Download AMemberDownloadsTransactionsForThePastYear
+ *     MAKE EditTx ABuyerChangesTheTransactionDescription
+ *     MAKE EditTx ABuyerDisputesACharge
+ *     MAKE EditTx ASellerReversesACharge
+ *     MAKE Invest AMemberJoinsTheInvestmentClub
+ *     MAKE Invoice AMemberConfirmsRequestToChargeAnotherMember
+ *     MAKE Invoice AMemberConfirmsRequestToChargeANotyetMember
+ *     MAKE Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     MAKE Membership AMemberSignsInForTheFirstTime
+ *     MAKE PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     MAKE Preferences AMemberVisitsThePreferencesPage
+ *     MAKE Preferences AnotherMemberVisitsThePreferencesPage
+ *     MAKE Relations MemberHasAnEmployeeConfirmed
+ *     MAKE Relations MemberHasAnEmployeeUnconfirmed
+ *     MAKE Relations MemberHasARelationWithAContractor
+ *     MAKE Relations MemberHasAnEmployeeClaimed
+ *     MAKE Relations EmployeeCanOnlyRead
+ *     MAKE Relations MemberHasAnEmployer
+ *     MAKE Relations MemberHasAccessToEmployeeAccount
+ *     MAKE Relations MemberCompanyHasRelations
+ *     MAKE Relations ItsComplicated
+ *     MAKE ScanCard SomeoneScansAMemberCard
+ *     MAKE ScanCard SomeoneScansACompanyAgentCard
+ *     MAKE Signin AMemberVisitsTheMemberSite
+ *     MAKE Signin AMemberClicksALinkToResetPassword
+ *     MAKE Signin AMemberClicksALinkToResetPasswordWithWrongCode
+ *     MAKE Signin AMemberClicksALinkToResetPasswordForUnknownAccount
+ *     MAKE Signup ANewbieVisitsTheRegistrationPageWithExpiredInvite
+ *     MAKE Signup ANewbieVisitsTheRegistrationPageWithAUsedInvite
+ *     MAKE Summary AMemberClicksTheSummaryTab
+ *     MAKE Summary AMemberClicksTheSummaryTabWithRoundups
+ *     MAKE Summary AnAgentClicksTheSummaryTabWithoutPermissionToManage
+ *     MAKE Summary ACompanyAgentClicksTheSummaryTab
+ *     MAKE Summary MembersAccountIsNotActive
+ *     MAKE Transactions AMemberLooksAtTransactionsForThePastYear
+ *     MAKE Transactions AMemberLooksAtTransactionsForThePastFewDays
+ *     MAKE Transactions AMemberLooksAtTransactionsWithRoundups
+ */
+function memberVisitsPage($id, $page) {return t\memberVisitsPage($id, $page);}
+
+/**
+ * member is logged out
+ *
+ * in: MAKE Membership AMemberSignsInForTheFirstTime
+ *     MAKE PartnerSignup Setup
+ *     MAKE Signin Setup
+ *     MAKE Signin AMemberClicksALinkToResetPassword
+ *     MAKE Signup Setup
+ */
+function memberIsLoggedOut() {
+  global $testOnly, $mya;
+  w\setAcct(); // make sure we notice, if signed in
+  //u\deb('memberIsLoggedOut top loggedin=' . \user_is_logged_in());
+  if ($testOnly) return !$mya;
+  w\setAcct(NULL);
+  return TRUE;
+}
+
+/**
+ * invitation to email (ARG) from member (ARG) is (ARG)
+ *
+ * in: MAKE Membership AMemberSignsInForTheFirstTime
+ *     MAKE Signup ANewbieVisitsTheRegistrationPageWithExpiredInvite
+ *     MAKE Signup ANewbieVisitsTheRegistrationPageWithAUsedInvite
+ *     MAKE Signup ANewbieRegistersInWesternMassachusetts
+ *     MAKE Signup ANewbieRegistersWithADifferentLegalName
+ *     MAKE Signup ANewbieRegistersFromElsewhere
+ *     MAKE Signup ANewbieRegistersWithNoCase
+ *     MAKE Signup AMemberRegistersBadEmail
+ *     MAKE Signup AMemberRegistersBadName
+ *     MAKE Signup AMemberRegistersBadZip
+ *     MAKE Signup AMemberRegistersAgain
+ *     MAKE Signup AMemberRegistersWithAnExistingCompany
+ *     MAKE Signup AMemberRegistersWithAnUnknownCompany
+ *     MAKE Signup AMemberRegistersWithACompanyWithNoRelation
+ *     MAKE Signup AMemberRegistersWithABadCompanyPhone
+ *     MAKE SignupCo AMemberRegistersACompany
+ */
+function invitationToEmailFromMemberIs($email, $id, $code) {
+  global $testOnly; if ($testOnly) return FALSE;
+  $email = t\fixEmail($email);
+  $uid = t\uid($id);
+  if ($iid = db\get('id', 'r_invites', 'email=:email AND inviter=:uid', compact('email', 'uid'))) {
+    db\q('UPDATE r_invites SET code=:code WHERE id=:iid', compact('code', 'iid'));
+  } elseif ($code) r\invite($email, $uid, $code);
+//  t\SERVER('REQUEST_URI', "whatever/$code"); // fake the URI
+  return TRUE;
+}
+
+/**
+ * no relation: (ARG)
+ *
+ * in: TEST Signup AMemberRegistersWithAnUnknownCompany
+ */
+function noRelation($relations) {
+  global $testOnly;
+  foreach ($relations as $one) if (r\relation(1, t\uid($one['main']), t\uid($one['agent']))) return FALSE;
+  return TRUE;
+}
+
+/**
+ * member (ARG) signs in the first time
+ *
+ * in: 
+ */
+function memberSignsInTheFirstTime($uid) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  memberVisitsPage($uid, 'summary');
+  return db\get('created=login', 'users', 'uid=' . t\uid($uid));
+}
+
+/**
+ * member (ARG) account is not active
+ *
+ * in: 
+ */
+function memberAccountIsNotActive($id) {
+  global $testOnly; if ($testOnly) return FALSE;
+  $uid = r\qo($id)->id;
+  if (!$uid) return FALSE;
+  r\acct($uid)->setBit(B_OK, FALSE);
+  return TRUE;
+}
+
+/**
+ * with done (ARG)
+ *
+ * in: 
+ */
+function withDone($steps) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  global $formOut;
+  return $steps == $formOut['done'];
+}
+
+/**
+ * member (ARG) has done step (ARG)
+ *
+ * in: 
+ */
+function memberHasDoneStep($uid, $step) {return t\doneStep($uid, $step);}
+
+/**
+ * member (ARG) supplies (ARG): (ARG)
+ *
+ * in: 
+ */
+function memberSupplies($uid, $field, $value) {
+  global $testOnly; if ($testOnly) return FALSE;
+  $a = r\acct($uid = t\uid($uid));
+  return $a->update(ray($field, $value));
+}
+
+/**
+ * member (ARG) has permission (ARG)
+ *
+ * in: MAKE Membership AMemberSignsInForTheFirstTime
+ */
+function memberHasPermission($uid, $permission) {
+  global $testOnly; if ($testOnly) return FALSE;
+  r\acct(t\uid($uid))->setBit(u\consta('b', $permission), TRUE);
+  return TRUE;
+}
+
+/**
+ * member (ARG) one-time password is (ARG)
+ *
+ * in: 
+ */
+function memberOnetimePasswordIs($id, $pass) {
+  global $testOnly;
+  if (!$a = r\acct($uid = t\uid($id))) return FALSE;
+  if (!$testOnly) {
+    $expires = REQUEST_TIME + R_SIGNIN_HOURS * HOUR_SECS;
+    $oneTimePass = compact('pass', 'expires');
+    $a->update(compact('oneTimePass'));
+  }
+  return ($a->oneTimePass['pass'] == $pass and $a->oneTimePass['expires'] > REQUEST_TIME);
+}
+
+/**
+ * we notice (ARG) to member (ARG) with subs: (ARG)
+ *
+ * in: TEST EditTx ABuyerIncreasesAPaymentAmount
+ *     TEST EditTx ABuyerChangesTheGoodsStatus
+ *     TEST Exchange AMemberConfirmsRequestToPayAnotherMember
+ *     TEST Gift AMemberDonates
+ *     TEST Invoice AMemberDeniesAnInvoice
+ *     TEST Transact AMemberConfirmsRequestToPayAnotherMember
+ *     TEST Transact AMemberConfirmsRequestToPayAMemberCompany
+ */
+function weNoticeToMemberWithSubs($notice, $id, $subs) {return t\notice($notice, $id, $subs);}
+
+/**
+ * gifts: (ARG)
+ *
+ * in: TEST Gift AMemberDonates
+ *     TEST Gift AMemberDonatesWithInsufficientFunds
+ */
+function gifts($gifts) {return t\gifts($gifts);}
+
+/**
+ * we download (ARG) with: (ARG)
+ *
+ * in: TEST Download AMemberDownloadsTransactionsForThePastYear
+ */
+function weDownloadWith($name, $rows) {
+  global $testOnly;
+  global $testCSV, $testCSVname;
+
+  if (@$testCSVname != $name) return t\output("$testCSVname <> $name");
+  if (!is_array($testCSV) or empty($testCSV)) return t\output('testCSV empty');
+  $testCSV2 = $testCSV; // don't alter this (withDownloadColumns() needs it)
+  $headers = array_shift($testCSV2);
+  if ($headers[0] == '#') $headers[0] = 't#';
+  foreach ($testCSV2 as $csvRow) {
+///  debug(compact('headers', 'csvRow'));
+    $csvRow = array_combine($headers, $csvRow); // add keys
+/**/ if (!$row = array_shift($rows)) return t\output('extra row in CSV: ' . print_r($csvRow, 1));
+    foreach ($row as $key => $value) {
+///    debug(compact('row','csvRow'));
+      if (strpos($value, '%') !== FALSE) $value = t\lastMinuteSubs($value);
+///      if (!isset($csvRow[$key])) debug(compact('key', 'csvRow', 'value'));
+/**/  if (!t\eq($csvValue = @$csvRow[$key], $value)) return t\output("key=$key csvValue<>expected value ($csvValue<>$value) csvRow:" . print_r($csvRow, 1));
+    }
+  }
+  return TRUE;
+}
+
+/**
+ * with download columns: (ARG)
+ *
+ * in: TEST Download AMemberDownloadsTransactionsForThePastYear
+ */
+function withDownloadColumns($columns) {
+  global $testOnly;
+  global $testCSV, $testCSVname;
+
+  if (!is_array($testCSV) or empty($testCSV)) return FALSE;
+  $testCSV2 = $testCSV; // don't alter this (just in case)
+  $headers = array_shift($testCSV2);
+/// debug(compact('headers','testCSV','columns'));
+  foreach ($columns as $one) if (array_search($one['column'], $headers) === FALSE) return FALSE;
+  return TRUE;
+}
+
+/**
+ * usd transfers: (ARG)
+ *
+ * in: MAKE Bank Setup
+ *     TEST Bank AMemberMovesCreditToTheBank
+ *     TEST Bank AMemberDrawsCreditFromTheBankWithZeroFloor
+ *     TEST Bank AMemberDrawsCreditFromTheBankWithAdequateFloor
+ *     MAKE Bank AMemberAsksToDoTwoTransfersOutInOneDay
+ *     MAKE Community Setup
+ *     MAKE Download Setup
+ *     MAKE Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     MAKE Statement Setup
+ *     MAKE Summary Setup
+ *     MAKE Transactions Setup
+ */
+function usdTransfers($tx) {return t\usdTransfers($tx);}
+
+
+/**
+ * usd transfer count is (ARG)
+ *
+ * in: 
+ */
+function usdTransferCountIs($count) {return (t\usdTransferCount() == $count);}
+
+/**
+ * member (ARG) scans member card (ARG)
+ *
+ * in: 
+ */
+function memberScansMemberCard($id1, $id2) {
+  global $testOnly; if ($testOnly) return FALSE;
+  t\logIn($id1);
+  
+}
+
+/**
+ * member (ARG) card code is (ARG)
+ *
+ * in: 
+ */
+function memberCardCodeIs($id, $cardCode) {
+  global $testOnly; if ($testOnly) return FALSE;
+  $a = r\acct(t\fullQid($id));
+  $secure = compact('cardCode') + ($a->secure ?: array());
+  return $a->update(compact('secure'));
+}
+
+/**
+ * agent (ARG) card code is (ARG)
+ *
+ * in: 
+ */
+function agentCardCodeIs($id, $cardCode2) {
+  global $testOnly; if ($testOnly) return FALSE;
+  $a = r\acct(t\fullQid($id));
+  $secure = compact('cardCode2') + ($a->secure ?: array());
+  return $a->update(compact('secure'));
+}
+
+/**
+ * cron runs (ARG)
+ *
+ * in: MAKE Community CronCalculatesTheStatistics
+ *     MAKE Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     MAKE Summary Setup
+ */
+function cronRuns($op) {return t\cronRuns($op);}
+
+/**
+ * statistics get set (ARG)
+ *
+ * in: MAKE Community CronCalculatesTheStatistics
+ */
+function statisticsGetSet($time) {
+  global $testOnly; if ($testOnly) return FALSE;
+  return r\getStats(r\serverUid(), $time) ? TRUE : FALSE;
+}
+
+/**
+ * members have: (ARG)
+ *
+ * in: BOTH Coupons AMemberRedeemsAGiftCoupon
+ *     MAKE Download AMemberDownloadsTransactionsForThePastYear
+ *     MAKE Invoice AMemberApprovesInvoicesForevermore
+ *     TEST Joint AMemberRequestsAJointAccount
+ *     BOTH Joint AJoinedAccountSlaveMemberRequestsANewMinimum
+ *     MAKE Joint AJoinedAccountMemberLooksAtTransactionHistoryAndSummary
+ *     BOTH Joint AJoinedAccountMemberUnjoinsTheAccount
+ *     MAKE Statement Setup
+ *     MAKE Summary Setup
+ *     MAKE Summary MembersAccountIsNotActive
+ *     MAKE Transactions AMemberLooksAtTransactionsForThePastYear
+ */
+function membersHave($list) {return t\membersHave($list);}
+
+/**
+ * we redirect to (ARG)
+ *
+ * in: TEST ScanCard SomeoneScansAMemberCard
+ */
+function weRedirectTo($page) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  global $lastGo;
+  $lastGo = preg_replace('/&tm=[0-9]+/', '', $lastGo); // ignore time, when redirecting to promo site
+  if (!$res = ($lastGo == $page)) t\output(compact('lastGo', 'page'));
+  return $res;
+}
+
+/**
+ * member (ARG) is on step (ARG) within (ARG) seconds
+ *
+ * in: 
+ */
+function memberIsOnStepWithinSeconds($id, $step, $secs) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  $us = new r\usd(r\acct(t\uid($id)));
+  for ($i = 0; $i < $secs; $i++) {
+    sleep(1);
+    if ($us->step() == $step) return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * account (ARG) was set up by member (ARG)
+ *
+ * in: 
+ */
+function accountWasSetUpByMember($coId, $id) {
+  global $testOnly; if ($testOnly) return FALSE;
+  $by = t\uid($id);
+  $co = r\acct(t\uid($coId));
+  return $co->update(compact('by'));
+}
+
+/**
+ * next DO code is (ARG)
+ *
+ * in: MAKE Gift AMemberDonates
+ *     MAKE Transact AMemberConfirmsRequestToPayAMemberCompany
+ */
+function nextDOCodeIs($code) {
+  global $testOnly; if ($testOnly) return FALSE;
+  global $testDoCode;
+  return $testDoCode = $code;
+}
+
+/**
+ * invitation (ARG) was sent on (ARG)
+ *
+ * in: MAKE Signup ANewbieVisitsTheRegistrationPageWithExpiredInvite
+ */
+function invitationWasSentOn($code, $dt) {
+  global $testOnly; if ($testOnly) return FALSE;
+  return db\q("UPDATE r_invites SET invited='$dt' WHERE code='$code'");
+}
+
+/**
+ * devices: (ARG)
+ *
+ * in: 
+ */
+function devices($list) {return t\devices($list);}
+
+/**
+ * invoices: (ARG)
+ *
+ * in: TEST Exchange AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Invoice AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Invoice AMemberConfirmsRequestToChargeANotyetMember
+ *     TEST Invoice AMemberDeniesAnInvoice
+ *     TEST Invoice AMemberApprovesAnInvoiceWithInsufficientFunds
+ *     TEST Invoice AMemberApprovesInvoicesForevermore
+ *     TEST Invoice AMemberApprovesAnInvoiceToATrustingCustomer
+ *     TEST Transact AMemberConfirmsRequestToChargeAnotherMember
+ */
+function invoices($list) {return t\invoices($list);}
+
+/**
+ * signup company info is remembered
+ *
+ * in: 
+ */
+function signupCompanyInfoIsRemembered() {
+  global $testOnly; if (!$testOnly) return FALSE;
+}
+
+/**
+ * signup company info for account (ARG) is remembered
+ *
+ * in: TEST Signup AMemberRegistersWithAnUnknownCompany
+ */
+function signupCompanyInfoForAccountIsRemembered($id) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  return (bool) ($a = r\acct(t\uid($id)) and $a->signupCo);
+}
+
+/**
+ * that (ARG) has link results: (ARG)
+ *
+ * in: TEST Gift AMemberDonates
+ *     TEST Transact AMemberConfirmsRequestToPayAMemberCompany
+ */
+function thatHasLinkResults($thing, $info) {return t\hasLinkResults($thing, $info);}
+
+/**
+ * member (ARG) edits transaction (ARG) with values: (ARG)
+ *
+ * in: MAKE EditTx ABuyerChangesTheTransactionDescription
+ *     MAKE EditTx ABuyerIncreasesAPaymentAmount
+ *     MAKE EditTx ABuyerChangesTheGoodsStatus
+ *     MAKE EditTx ABuyerTriesToDecreaseAPaymentAmount
+ */
+function memberEditsTransactionWithValues($id, $xid, $values) {
+  return memberConfirmsFormWithValues($id, "history/transactions/xid=$xid&do=edit", $values);
+}
+
+/**
+ * a member posts to (ARG) with values: (ARG)
+ *
+ * in: 
+ */
+function aMemberPostsToWithValues($page, $values) {return memberConfirmsFormWithValues('?', $page, $values);}
+
+/**
+ * member (ARG) is logged in
+ *
+ * in: TEST Membership AMemberSignsInForTheFirstTime
+ *     TEST Signin AMemberSignsInWithUsernameOnTheMemberSite
+ *     TEST Signin AMemberSignsInWithAccountIDOnTheMemberSite
+ *     TEST Signin AMemberSignsInWithEmailOnTheMemberSite
+ *     TEST Signin AMemberClicksALinkToResetPassword
+ */
+function memberIsLoggedIn($id) {
+  global $testOnly, $mya;
+  return $testOnly ? ($mya and $mya = r\acct() and t\uid($id) == $mya->id) : t\login($id);
+}
+
+/**
+ * next random code is (ARG)
+ *
+ * in: MAKE Membership AMemberSignsInForTheFirstTime
+ *     MAKE PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     MAKE Signin AMemberAsksForANewPasswordForUsername
+ *     MAKE Signin AMemberAsksForANewPasswordForAccountID
+ *     MAKE Signin AMemberAsksForANewPasswordForEmail
+ *     MAKE Signin AMemberClicksALinkToResetPassword
+ *     MAKE Signin AMemberClicksALinkToResetPasswordWithWrongCode
+ *     MAKE Signin AMemberClicksALinkToResetPasswordForUnknownAccount
+ *     MAKE Signup ANewbieRegistersInWesternMassachusetts
+ *     MAKE Signup ANewbieRegistersWithAnUnconfirmedIcardInvitation
+ *     MAKE Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ *     MAKE Signup ANewbieRegistersFromElsewhere
+ */
+function nextRandomCodeIs($code) {global $nextCode; return $nextCode = $code;}
+
+/**
+ * we say error in field (ARG): (ARG)
+ *
+ * in: TEST Company AMemberGivesABadEmployeeCount
+ *     TEST Company AMemberGivesABadGross
+ */
+function weSayErrorInField($field, $index) {
+  return weSayWithSubs('error', strtoupper($field) . ':|' . $index, []);
+}
+
+/**
+ * member (ARG) completes relations form with values: (ARG)
+ *
+ * in: MAKE Joint AMemberRequestsAJointAccount
+ *     MAKE Joint AJoinedAccountMemberUnjoinsTheAccount
+ *     MAKE Joint AMemberRequestsTwoJoinsAtOnce
+ *     MAKE Relations AMemberAddsARelation
+ *     MAKE Relations AMemberTriesToAddARelationWithSelf
+ *     MAKE Relations AMemberTriesToAddARelationAgain
+ */
+function memberCompletesRelationsFormWithValues($id1, $list) {
+  foreach ($list as $i => $rec) {
+    if (isset($rec['other'])) {
+      $reid = r\relation('reid', t\uid($id1), t\uid($rec['other'])); // compound qid
+      u\EXPECT($reid, "missing relation record for $id1,".$rec['other']);
+      unset($list[$i]['other']);
+      foreach (ray('draw permission employee owner customer') as $k) if (isset($rec[$k])) {
+        $list[$i]["$k-$i-$reid"] = $k == 'permission' ? u\consta('b', $rec[$k]) - B_RELATED : $rec[$k];
+        unset($list[$i][$k]);
+      }
+    }
+  }
+  return t\completeForm($id1, "settings/relations", $list, TRUE);
+}
+
+/**
+ * member (ARG) cache is ok
+ *
+ * in: TEST Joint AMemberRequestsAJointAccount
+ *     TEST Joint AJoinedAccountMemberUnjoinsTheAccount
+ */
+function memberCacheIsOk($id) {return r\acct(t\uid($id))->cacheOk();}
+
+/**
+ * member (ARG) has no photo ID recorded
+ *
+ * in: MAKE Preferences AMemberChangesPreferences
+ */
+function memberHasNoPhotoIDRecorded($id) {return t\noPhotoId($id);}
+
+/**
+ * signup args: (ARG)
+ *
+ * in: TEST SignupCo AMemberRegistersACompany
+ *     TEST SignupCo AMemberRegistersACompanyWhileManagingAnotherAccount
+ *     TEST SignupCo AMemberRegistersACompanyHavingGivenCompanyInfo
+ */
+function signupArgs($args) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  global $signupArgs;
+  foreach ($args[0] as $k => $v) if (@$signupArgs[$k] != $v) {
+    t\output(compact('args', 'signupArgs'));
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
+ * member (ARG) has company info: (ARG)
+ *
+ * in: MAKE SignupCo AMemberRegistersACompanyHavingGivenCompanyInfo
+ */
+function memberHasCompanyInfo($id, $info) {
+  global $testOnly;
+  $a = r\acct(t\uid($id));
+  if (!$testOnly) return $a->update('signupCo', $info[0]);
+  extract($signupCo = $a->signupCo ?: []);
+  foreach ($info[0] as $k => $v) if ($$k != $v) {t\output(compact('id', 'signupCo', 'info')); return FALSE;}
+  return TRUE;
+}
+
+/**
+ * member (ARG) clicks (ARG) on transaction (ARG)
+ *
+ * in: MAKE EditTx ABuyerDisputesACharge
+ *     MAKE EditTx ASellerReversesACharge
+ */
+function memberClicksOnTransaction($id, $do, $xid) {
+  global $testPeriod;
+  if ($do == 'X') $do = 'no';
+  return t\memberVisitsPage($id, "history/transactions/period=$testPeriod&do=$do&xid=$xid");
+}
+
+/**
+ * member (ARG) confirms (ARG) on transaction (ARG)
+ *
+ * in: MAKE EditTx ABuyerDisputesACharge
+ */
+function memberConfirmsOnTransaction($id, $do, $xid) {
+  global $testPeriod;
+  if ($do == 'X') $do = 'no';
+  return t\completeForm($id, "history/transactions/period=$testPeriod&do=$do&xid=$xid", '', TRUE);
+}
+
+/**
+ * we message (ARG) to member (ARG) with subs: (ARG)
+ *
+ * in: TEST Exchange AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Invoice AMemberConfirmsRequestToChargeAnotherMember
+ *     TEST Invoice AMemberConfirmsRequestToChargeANotyetMember
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedIcardInvitation
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ *     TEST Transact AMemberConfirmsRequestToChargeAnotherMember
+ */
+function weMessageToMemberWithSubs($index, $id, $subs) {return t\weMessage($index, $id, $subs);}
+
+/**
+ * member (ARG) email invitation code is (ARG)
+ *
+ * in: MAKE Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ */
+function memberEmailInvitationCodeIs($id, $code) {
+  global $testOnly; // for now, choose the test code according to the creation date (in the tests)
+  $code0 = r\acct(t\uid($id))->iCardCode(IBY_SELF);
+  return ($code0 == $code or $code0 == $code . 'A');
+}
+
+/**
+ * we show checked: (ARG)
+ *
+ * in: TEST Preferences AMemberVisitsThePreferencesPage
+ *     TEST Preferences AnotherMemberVisitsThePreferencesPage
+ */
+function weShowChecked($what, $wantSet = TRUE) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  global $tChecked;
+
+  $checks = join('|', @$tChecked ?: []);
+  $checked = $wantSet ? 'checked' : 'unchecked';
+  
+  foreach ($what as $one) {
+    list ($k, $v) = $one;
+    if (!weShow($k)) {t\output("Missing \"$k\"."); return FALSE;}
+    $set = (strpos($checks, $v) !== FALSE);
+    if ($set != $wantSet) {t\output("Missing $checked \"$v\"."); return FALSE;}
+  }
+  return TRUE;
+}
+
+/**
+ * we show unchecked: (ARG)
+ *
+ * in: TEST Preferences AMemberVisitsThePreferencesPage
+ *     TEST Preferences AnotherMemberVisitsThePreferencesPage
+ */
+function weShowUnchecked($what) {return weShowChecked($what, FALSE);}
+
+/**
+ * radio (ARG) is (ARG)
+ *
+ * in: TEST Preferences AMemberVisitsThePreferencesPage
+ *     TEST Preferences AnotherMemberVisitsThePreferencesPage
+ */
+function radioIs($k, $v) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  global $tRadios;
+
+  return (strpos(@$tRadios[$k], $v) !== FALSE);  
+}
+
+/**
+ * reward step is (ARG)
+ *
+ * in: 
+ */
+function rewardStepIs($step) {
+  global $testOnly, $testRewardStep;
+  return $testOnly ? FALSE : ($testRewardStep = $step);
+}
+
+/**
+ * member (ARG) one-time password is set to (ARG)
+ *
+ * in: TEST Membership AMemberSignsInForTheFirstTime
+ *     TEST PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     TEST Signup ANewbieRegistersInWesternMassachusetts
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedIcardInvitation
+ *     TEST Signup ANewbieRegistersWithAnUnconfirmedSelfinvitation
+ */
+function memberOnetimePasswordIsSetTo($id, $pass) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  if (!$a = r\acct(t\uid($id))) return FALSE;
+  return (@$a->oneTimePass['pass'] == $pass and @$a->oneTimePass['expires'] > REQUEST_TIME);
+}
+/**
+ * member (ARG) completes form (ARG) with name (ARG) and all checkboxes
+ *
+ * in: MAKE Membership AMemberSignsInForTheFirstTime
+ */
+function memberCompletesFormWithNameAndAllCheckboxes($id, $page, $signedBy) {
+  global $testOnly; if ($testOnly) return FALSE;
+  $values = compact('signedBy');
+  for ($i = R_AGREE_0; $i <= R_AGREE_9; $i++) $values["check$i"] = TRUE;
+  return t\completeForm($id, $page, [$values]);
+}
+
+/**
+ * proxies: (ARG)
+ *
+ * in: MAKE Membership AMemberSignsInForTheFirstTime
+ */
+function proxies($list) {return t\proxies($list);}
+
+/**
+ * member (ARG) views statement for (ARG)
+ *
+ * in: MAKE Statement AMemberLooksAtAStatementForPreviousMonth
+ */
+function memberViewsStatementFor($id, $month) {
+  include_once R_ROOT . '/forms/statement.inc';
+  global $base_url;
+  global $testOnly; if ($testOnly) return FALSE;
+
+  t\logIn($id);
+  w\statement($month);
+  return TRUE;
+}
+
+/**
+ * we tell (ARG) CO (ARG) with subs: (ARG)
+ *
+ * in: TEST Membership AMemberSignsInForTheFirstTime
+ */
+function weTellCOWithSubs($id, $topic, $subs) {return t\weTellAdmin($topic, $subs, t\uid($id));}
+
+/**
+ * community (ARG) is (ARG)
+ *
+ * in: 
+ */
+function communityIs($bit, $setting) {
+  global $testOnly;
+  $ctty = ctty('aab');
+  $bit = u\consta('b', $bit);
+  $setting = ($setting == 'on');
+  return $testOnly ? ($ctty->can($bit) == $setting) : $ctty->setBit($bit, $setting);
+}
+
+/**
+ * we tell (ARG) CO (ARG)
+ *
+ * in: 
+ */
+function weTellCO($arg1, $arg2) {
+  global $testOnly;
+  todo;
+}
+
+/**
+ * someone posts to page (ARG) with: (ARG)
+ *
+ * in: MAKE PartnerSignup ANewbieVisitsTheRegistrationPageSentByAPartner
+ *     MAKE PartnerSignup AMemberVisitsTheRegistrationPageSentByAPartner
+ */
+function someonePostsToPageWith($page, $args) {return t\postToPage($page, $args);}
+
+/**
+ * coupons: (ARG)
+ *
+ * in: TEST Coupons AMemberRedeemsAGiftCoupon
+ *     TEST Coupons AMemberRedeemsADiscountCouponForADollarAmount
+ */
+function coupons($list) {return t\coupons($list);}
+
+/**
+ * we scrip (ARG) with subs: (ARG)
+ *
+ * in: TEST EditTx ABuyerDisputesACharge
+ *     TEST EditTx ASellerReversesACharge
+ *     TEST Exchange AMemberAsksToChargeAnotherMember
+ *     TEST Exchange AMemberAsksToPayAnotherMember
+ *     TEST Transact AMemberAsksToChargeAnotherMemberForGoods
+ *     TEST Transact AMemberAsksToPayAnotherMemberForGoods
+ *     TEST Transact AMemberAsksToPayAnotherMemberForLoanreimbursement
+ */
+function weScripWithSubs($script, $args = []) {
+  global $testOnly; if (!$testOnly) return FALSE;
+  global $scriptScraps;
+  if (!isset($scriptScraps[$script])) return FALSE;
+  $args = $args[0];
+  $got = just(array_keys($args), $scriptScraps[$script]);
+  foreach ($args as $k => $v) if (!t\eq(@$got[$k], $v)) return FALSE;
+  return TRUE;
+}
